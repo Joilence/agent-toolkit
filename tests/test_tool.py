@@ -2,7 +2,7 @@ import asyncio
 import logging
 import platform
 import time
-from typing import Annotated
+from typing import Annotated, List, Dict, Optional, Any
 
 import pytest
 from pydantic import Field, ValidationError, TypeAdapter
@@ -255,3 +255,246 @@ class TestToolDef:
         assert hasattr(test_function, "_tool_def")
         tool_def_attr = getattr(test_function, "_tool_def")
         assert tool_def_attr.description == ""
+
+
+class TestJSONParameterConversion:
+    """Test JSON string parameter conversion for MCP compatibility.
+
+    These tests ensure that when MCP clients send array/dict parameters
+    as JSON strings, they are automatically converted to Python types.
+    """
+
+    # Test functions with various parameter types
+    @staticmethod
+    @ltls.tool_def()
+    def process_list(items: List[str]) -> dict:
+        """Process a list of strings."""
+        return {"count": len(items), "items": items}
+
+    @staticmethod
+    @ltls.tool_def()
+    def process_dict(data: Dict[str, Any]) -> dict:
+        """Process a dictionary."""
+        return {"keys": list(data.keys()), "data": data}
+
+    @staticmethod
+    @ltls.tool_def()
+    def process_optional_list(items: Optional[List[int]] = None) -> dict:
+        """Process an optional list of integers."""
+        if items is None:
+            return {"items": None}
+        return {"sum": sum(items), "items": items}
+
+    @staticmethod
+    @ltls.tool_def()
+    def process_string(content: str) -> dict:
+        """Process a string that might contain JSON."""
+        return {"content": content, "length": len(content)}
+
+    @staticmethod
+    @ltls.tool_def()
+    def process_mixed(
+        text: str,
+        numbers: List[float],
+        config: Dict[str, str],
+        optional_tags: Optional[List[str]] = None,
+    ) -> dict:
+        """Process mixed parameter types."""
+        return {
+            "text": text,
+            "numbers": numbers,
+            "config": config,
+            "tags": optional_tags,
+        }
+
+    @staticmethod
+    @ltls.tool_def()
+    def process_nested_list(matrix: List[List[int]]) -> dict:
+        """Process nested list structure."""
+        return {
+            "rows": len(matrix),
+            "cols": len(matrix[0]) if matrix else 0,
+            "matrix": matrix,
+        }
+
+    def test_list_parameter_with_json_string(self):
+        """Test that JSON string arrays are converted to Python lists."""
+        tool = create_tool(self.process_list)
+
+        # Test with JSON string (MCP client behavior)
+        result = tool.execute({"items": '["apple", "banana", "cherry"]'})
+        assert result["count"] == 3
+        assert result["items"] == ["apple", "banana", "cherry"]
+
+        # Test with native list (should still work)
+        result = tool.execute({"items": ["apple", "banana", "cherry"]})
+        assert result["count"] == 3
+        assert result["items"] == ["apple", "banana", "cherry"]
+
+    def test_dict_parameter_with_json_string(self):
+        """Test that JSON string objects are converted to Python dicts."""
+        tool = create_tool(self.process_dict)
+
+        # Test with JSON string
+        result = tool.execute({"data": '{"name": "John", "age": 30}'})
+        assert "name" in result["keys"]
+        assert "age" in result["keys"]
+        assert result["data"]["name"] == "John"
+        assert result["data"]["age"] == 30
+
+        # Test with native dict
+        result = tool.execute({"data": {"name": "John", "age": 30}})
+        assert result["data"]["name"] == "John"
+
+    def test_optional_list_with_json_string(self):
+        """Test Optional[List] parameters with JSON strings."""
+        tool = create_tool(self.process_optional_list)
+
+        # Test with JSON string
+        result = tool.execute({"items": "[1, 2, 3, 4, 5]"})
+        assert result["sum"] == 15
+        assert result["items"] == [1, 2, 3, 4, 5]
+
+        # Test with None (omitted parameter)
+        result = tool.execute({})
+        assert result["items"] is None
+
+        # Test with native list
+        result = tool.execute({"items": [1, 2, 3]})
+        assert result["sum"] == 6
+
+    def test_string_parameter_preserves_json(self):
+        """Test that string parameters containing JSON are NOT parsed."""
+        tool = create_tool(self.process_string)
+
+        # JSON object string should stay as string
+        json_obj = '{"this": "should remain a string"}'
+        result = tool.execute({"content": json_obj})
+        assert result["content"] == json_obj
+        assert isinstance(result["content"], str)
+
+        # JSON array string should also stay as string
+        json_arr = '["this", "should", "also", "remain", "a", "string"]'
+        result = tool.execute({"content": json_arr})
+        assert result["content"] == json_arr
+        assert isinstance(result["content"], str)
+
+    def test_mixed_parameters_with_json_strings(self):
+        """Test mixed parameter types with some as JSON strings."""
+        tool = create_tool(self.process_mixed)
+
+        result = tool.execute(
+            {
+                "text": "Hello World",
+                "numbers": "[1.5, 2.5, 3.5]",
+                "config": '{"env": "prod", "debug": "false"}',
+                "optional_tags": '["urgent", "feature"]',
+            }
+        )
+
+        assert result["text"] == "Hello World"
+        assert result["numbers"] == [1.5, 2.5, 3.5]
+        assert result["config"]["env"] == "prod"
+        assert result["config"]["debug"] == "false"
+        assert result["tags"] == ["urgent", "feature"]
+
+    def test_invalid_json_stays_as_string(self):
+        """Test that invalid JSON strings cause validation errors."""
+        tool = create_tool(self.process_list)
+
+        # Invalid JSON should cause validation error
+        with pytest.raises(ValidationError) as exc_info:
+            tool.execute({"items": "[not valid json"})
+
+        error = exc_info.value
+        assert "list" in str(error).lower()
+
+    def test_empty_collections_as_json_strings(self):
+        """Test empty arrays and objects as JSON strings."""
+        list_tool = create_tool(self.process_list)
+        dict_tool = create_tool(self.process_dict)
+
+        # Empty array
+        result = list_tool.execute({"items": "[]"})
+        assert result["count"] == 0
+        assert result["items"] == []
+
+        # Empty object
+        result = dict_tool.execute({"data": "{}"})
+        assert result["keys"] == []
+        assert result["data"] == {}
+
+    def test_nested_structures_as_json_strings(self):
+        """Test nested data structures as JSON strings."""
+        tool = create_tool(self.process_nested_list)
+
+        # Nested list as JSON string
+        result = tool.execute({"matrix": "[[1, 2, 3], [4, 5, 6], [7, 8, 9]]"})
+        assert result["rows"] == 3
+        assert result["cols"] == 3
+        assert result["matrix"][1][1] == 5
+
+        # Native nested list should still work
+        result = tool.execute({"matrix": [[1, 2], [3, 4]]})
+        assert result["rows"] == 2
+        assert result["cols"] == 2
+
+    def test_json_with_whitespace(self):
+        """Test JSON strings with various whitespace formatting."""
+        tool = create_tool(self.process_list)
+
+        # JSON with extra whitespace
+        result = tool.execute({"items": '  [  "a" , "b" , "c"  ]  '})
+        assert result["items"] == ["a", "b", "c"]
+
+        # JSON with newlines and tabs
+        result = tool.execute({"items": '[\n\t"x",\n\t"y"\n]'})
+        assert result["items"] == ["x", "y"]
+
+    def test_type_mismatch_after_parsing(self):
+        """Test that type validation still works after JSON parsing."""
+        tool = create_tool(self.process_list)
+
+        # JSON parses but wrong type (object instead of array)
+        with pytest.raises(ValidationError):
+            tool.execute({"items": '{"not": "an array"}'})
+
+        # JSON array but wrong element types
+        int_tool = create_tool(self.process_optional_list)
+        with pytest.raises(ValidationError):
+            int_tool.execute({"items": '["not", "integers"]'})
+
+    @pytest.mark.asyncio
+    async def test_async_execution_with_json_strings(self):
+        """Test async execution also handles JSON string conversion."""
+        tool = create_tool(self.process_list)
+
+        # Async execution with JSON string
+        result = await tool.aexecute({"items": '["async", "test"]'})
+        assert result["count"] == 2
+        assert result["items"] == ["async", "test"]
+
+    def test_regression_without_fix(self):
+        """Test that would fail if JSON preprocessing is removed.
+
+        This test documents the exact MCP client behavior that requires
+        the JSON string preprocessing fix in Tool._preprocess_json_arguments.
+        """
+
+        # This is the exact format MCP clients send
+        @ltls.tool_def()
+        def mcp_style_function(group_by: List[str]) -> dict:
+            """Function expecting list parameter like in MCP tools."""
+            return {"grouped_by": group_by}
+
+        tool = create_tool(mcp_style_function)
+
+        # This is what MCP clients send - JSON string instead of list
+        mcp_style_input = {"group_by": '["type", "status"]'}
+
+        # This should work with our fix
+        result = tool.execute(mcp_style_input)
+        assert result["grouped_by"] == ["type", "status"]
+
+        # Document the error that would occur without the fix:
+        # ValidationError: Input should be a valid list [type=list_type, input_value='["type", "status"]', input_type=str]

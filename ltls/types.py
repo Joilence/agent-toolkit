@@ -2,6 +2,7 @@ import json
 import functools
 from dataclasses import dataclass
 import inspect
+from typing import get_args, get_origin
 
 from typing import (
     Annotated,
@@ -13,6 +14,8 @@ from typing import (
     cast,
     overload,
     Sequence,
+    List,
+    Dict,
 )
 from abc import ABC
 from fastmcp.tools import FunctionTool as FastMCPFunctionTool
@@ -50,6 +53,73 @@ UnionToolParam = Union[OpenAIToolParam, AnthropicToolParam]
 class Tool(FastMCPFunctionTool):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    def _preprocess_json_arguments(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Convert JSON strings to Python objects where appropriate.
+
+        This handles the common case where MCP clients send array/object
+        parameters as JSON strings instead of native Python types.
+        """
+        # Get function signature to understand expected types
+        sig = inspect.signature(self.fn)
+        processed = {}
+
+        for key, value in arguments.items():
+            # Skip if not a string
+            if not isinstance(value, str):
+                processed[key] = value
+                continue
+
+            # Get expected type for this parameter
+            param = sig.parameters.get(key)
+            if not param or param.annotation == inspect.Parameter.empty:
+                processed[key] = value
+                continue
+
+            # Get the actual type, handling Optional and Union
+            expected_type = param.annotation
+            origin = get_origin(expected_type)
+
+            # Handle Optional[T] or Union[T, None]
+            if origin is Union:
+                args = get_args(expected_type)
+                # Filter out None to get the actual type
+                non_none_types = [t for t in args if t is not type(None)]
+                if len(non_none_types) == 1:
+                    expected_type = non_none_types[0]
+                    origin = get_origin(expected_type)
+
+            # Only try JSON parsing if expecting list/dict and string looks like JSON
+            should_try_parse = False
+            if origin in (list, List):
+                should_try_parse = value.strip().startswith(
+                    "["
+                ) and value.strip().endswith("]")
+            elif origin in (dict, Dict) or expected_type is dict:
+                should_try_parse = value.strip().startswith(
+                    "{"
+                ) and value.strip().endswith("}")
+
+            if should_try_parse:
+                try:
+                    parsed = json.loads(value)
+                    # Verify the parsed type matches expectation
+                    if origin in (list, List) and isinstance(parsed, list):
+                        processed[key] = parsed
+                    elif (
+                        origin in (dict, Dict) or expected_type is dict
+                    ) and isinstance(parsed, dict):
+                        processed[key] = parsed
+                    else:
+                        # Parsed but wrong type, keep as string
+                        processed[key] = value
+                except (json.JSONDecodeError, TypeError):
+                    # Not valid JSON, keep as string
+                    processed[key] = value
+            else:
+                processed[key] = value
+
+        return processed
 
     @overload
     def as_param(
@@ -101,8 +171,11 @@ class Tool(FastMCPFunctionTool):
             f"Executing tool: {self.name} with arguments:\n{json.dumps(arguments, indent=2)}"
         )
 
+        # Preprocess JSON string arguments
+        processed_arguments = self._preprocess_json_arguments(arguments)
+
         type_adapter = get_cached_typeadapter(self.fn)
-        result = type_adapter.validate_python(arguments)
+        result = type_adapter.validate_python(processed_arguments)
         return result
 
     async def aexecute(self, arguments: dict[str, Any]) -> Any:
@@ -111,8 +184,11 @@ class Tool(FastMCPFunctionTool):
             f"Executing tool: {self.name} with arguments:\n{json.dumps(arguments, indent=2)}"
         )
 
+        # Preprocess JSON string arguments
+        processed_arguments = self._preprocess_json_arguments(arguments)
+
         type_adapter = get_cached_typeadapter(self.fn)
-        result = type_adapter.validate_python(arguments)
+        result = type_adapter.validate_python(processed_arguments)
 
         if inspect.isawaitable(result):
             result = await result
