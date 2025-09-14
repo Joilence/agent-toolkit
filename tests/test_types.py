@@ -1,5 +1,5 @@
 import pytest
-from ltls.types import ToolParamSchema, Toolkit, ToolkitSuite, tool_def
+from agtk.types import ToolParamSchema, Toolkit, ToolkitSuite, tool_def
 
 
 class TestToolParamMode:

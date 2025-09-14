@@ -1,4 +1,4 @@
-# ltls (llm tools)
+# agtk (Agent Toolkit)
 
 - A minimal library to let you focus on building LLM tools. It automatically enables the tools to be used by LLM calls, MCP clients, etc.
 - A minimal CLI to install tools and run as MCP server.
@@ -12,18 +12,18 @@
 <summary>Develop tools</summary>
 
 ```python
-import ltls
+import agtk
 
-class MinimalFsToolkit(ltls.Toolkit):
+class MinimalFsToolkit(agtk.Toolkit):
 
-    @ltls.tool_def(
+    @agtk.tool_def(
         name="read_file",
         description="Read content from a file"
     )
     def read_file(self, file_path: str):
         return open(file_path).read()
 
-    @ltls.tool_def(
+    @agtk.tool_def(
         name="write_file",
         description="Write content to a file"
     )
@@ -78,21 +78,21 @@ mcp.run()
 <summary>Standalone as MCP server</summary>
 
 ```bash
-uv tool install git+https://github.com/Joilence/llm-tools
+uv tool install git+https://github.com/Joilence/agent-toolkits
 
 # Check commands
-ltls --help
+agtk --help
 
 # Install a tool (uses pip install under the hood)
-ltls install <package_name_or_git_url>
+agtk install <package_name_or_git_url>
 
 # List installed tools
-ltls list
+agtk list
 # List installed tools with details (description and parameters)
-ltls list --detail
+agtk list --detail
 
 # Start MCP server with installed tools
-ltls mcp
+agtk mcp
 ```
 
 </details>
@@ -102,14 +102,14 @@ ltls mcp
 <summary>Use with <a href="https://github.com/simonw/llm">simonw/llm</a> (🚧WIP)</summary>
 
 ```bash
-# install ltls
-llm install llm-ltls
+# install agtk
+llm install llm-agtk
 
 # install tools
-ltls install <tool_name>
+agtk install <tool_name>
 
 # use tools
-llm --ltls "what tools do you have?"
+llm --agtk "what tools do you have?"
 ```
 
 </details>

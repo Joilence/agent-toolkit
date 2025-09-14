@@ -3,9 +3,9 @@ import sys
 from runpy import run_module
 import logging
 
-from ltls.plugins import load_plugins, pm
-from ltls import Toolkit
-from ltls.types import ToolkitSuite
+from agtk.plugins import load_plugins, pm
+from agtk import Toolkit
+from agtk.types import ToolkitSuite
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 @click.option(
     "--debug",
     is_flag=True,
-    help="Enable debug logging for ltls and plugins.",
+    help="Enable debug logging for agtk and plugins.",
 )
 def cli(debug: bool):
-    """ltls (llm llm tools) offers common tools to build tools for LLM"""
+    """agtk (Agent Toolkit) offers common tools to build tools for LLM"""
     if debug:
         logging.basicConfig(level=logging.DEBUG)
         logger.setLevel(logging.DEBUG)
@@ -25,7 +25,7 @@ def cli(debug: bool):
 
 @cli.command()
 def mcp():
-    """Start ltls as an MCP server with all available tools"""
+    """Start agtk as an MCP server with all available tools"""
     from fastmcp import FastMCP
 
     tool_suite = ToolkitSuite(toolkits=[])
@@ -38,7 +38,7 @@ def mcp():
 
     if not tool_suite.get_tools():
         logger.warning(
-            "No toolkits / tools found, install tools by `ltls install <tool_name>`"
+            "No toolkits / tools found, install tools by `agtk install <tool_name>`"
         )
 
     mcp = FastMCP()
@@ -69,7 +69,7 @@ def mcp():
 )
 @click.pass_context
 def install(ctx, packages, upgrade, editable, force_reinstall, no_cache_dir):
-    """Install packages into the same environment as ltls"""
+    """Install packages into the same environment as agtk"""
     if ctx.parent and ctx.parent.params.get("debug"):
         logger.debug("Install command called with debug mode.")
     if not packages:
@@ -125,5 +125,5 @@ def list(ctx, detail: bool):
                     print(f"    Params: {tool.parameters}")
     else:
         print(
-            "No toolkits installed. You can install toolkits by `ltls install <tool_name>`"
+            "No toolkits installed. You can install toolkits by `agtk install <tool_name>`"
         )

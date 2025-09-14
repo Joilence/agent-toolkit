@@ -1,5 +1,5 @@
 from typing import Union, List, Optional
-import ltls
+import agtk
 import pytest
 from pydantic import BaseModel
 
@@ -20,20 +20,20 @@ class SearchQueryParams(BaseModel):
     categories: Optional[List[str]] = None
 
 
-class TestIntegrationToolkit(ltls.Toolkit):
+class TestIntegrationToolkit(agtk.Toolkit):
     """A test toolkit for integration testing."""
 
-    @ltls.tool_def(name="echo", description="Echo back the input")
+    @agtk.tool_def(name="echo", description="Echo back the input")
     def echo(self, message: str) -> str:
         """Echo back the input message."""
         return f"You said: {message}"
 
-    @ltls.tool_def(name="add", description="Add two numbers")
+    @agtk.tool_def(name="add", description="Add two numbers")
     def add(self, a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
         """Add two numbers and return the result."""
         return a + b
 
-    @ltls.tool_def(name="search", description="Search for items matching the query")
+    @agtk.tool_def(name="search", description="Search for items matching the query")
     def search(self, params: SearchQueryParams) -> List[str]:
         """Search for items matching the given query parameters.
 
@@ -80,7 +80,7 @@ class TestIntegrationToolkit(ltls.Toolkit):
         # Limit results
         return results[: params.max_results]
 
-    @ltls.tool_def(
+    @agtk.tool_def(
         name="calculate_stats",
         description="Calculate basic statistics for a list of numbers",
     )

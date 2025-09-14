@@ -3,6 +3,51 @@ revision = 3
 requires-python = ">=3.12"
 
 [[package]]
+name = "agtk"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "anthropic" },
+    { name = "fastmcp" },
+    { name = "openai" },
+    { name = "pip" },
+    { name = "pluggy" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "anthropic" },
+    { name = "litellm" },
+    { name = "mcp", extra = ["cli"] },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
+    { name = "ty" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "anthropic", specifier = ">=0.51.0" },
+    { name = "fastmcp", specifier = ">=2.11.1" },
+    { name = "openai", specifier = ">=1.79.0" },
+    { name = "pip", specifier = ">=25.1.1" },
+    { name = "pluggy", specifier = ">=1.5.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "anthropic", specifier = ">=0.51.0" },
+    { name = "litellm", specifier = ">=1.72.0" },
+    { name = "mcp", extras = ["cli"], specifier = ">=1.8.1" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio", specifier = ">=0.26.0" },
+    { name = "ruff" },
+    { name = "ty" },
+]
+
+[[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
 source = { registry = "https://pypi.org/simple" }
@@ -727,51 +772,6 @@ dependencies = [
     { name = "tokenizers" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3e/fc/02bfc7dcf6276fbbd5acf0ebcb188f824cf6d4ee8013d7150458c77c7047/litellm-1.74.15.post1.tar.gz", hash = "sha256:8c0f73f89f15603afebbc912cb30ba6f18439eb12249f16a37646752fb76825e", size = 9711380, upload-time = "2025-08-02T22:05:05.361Z" }
-
-[[package]]
-name = "ltls"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "anthropic" },
-    { name = "fastmcp" },
-    { name = "openai" },
-    { name = "pip" },
-    { name = "pluggy" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "anthropic" },
-    { name = "litellm" },
-    { name = "mcp", extra = ["cli"] },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "ruff" },
-    { name = "ty" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "anthropic", specifier = ">=0.51.0" },
-    { name = "fastmcp", specifier = ">=2.11.1" },
-    { name = "openai", specifier = ">=1.79.0" },
-    { name = "pip", specifier = ">=25.1.1" },
-    { name = "pluggy", specifier = ">=1.5.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "anthropic", specifier = ">=0.51.0" },
-    { name = "litellm", specifier = ">=1.72.0" },
-    { name = "mcp", extras = ["cli"], specifier = ">=1.8.1" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-asyncio", specifier = ">=0.26.0" },
-    { name = "ruff" },
-    { name = "ty" },
-]
 
 [[package]]
 name = "markdown-it-py"

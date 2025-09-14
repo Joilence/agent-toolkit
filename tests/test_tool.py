@@ -10,40 +10,40 @@ import anthropic
 from openai.types.chat.chat_completion_tool_param import ChatCompletionToolParam
 
 from fastmcp import FastMCP
-import ltls
-from ltls.types import Tool, ToolParamSchema
+import agtk
+from agtk.types import Tool, ToolParamSchema
 
 logger = logging.getLogger(__name__)
 
 
 # Test tool functions
-@ltls.tool_def()
+@agtk.tool_def()
 def sync_string_tool() -> str:
     """Returns system architecture as string."""
     return platform.machine()
 
 
-@ltls.tool_def()
+@agtk.tool_def()
 async def async_string_tool() -> str:
     """Returns timezone name asynchronously."""
     await asyncio.sleep(0.001)
     return time.tzname[0]
 
 
-@ltls.tool_def()
+@agtk.tool_def()
 def sync_number_tool(x: int, y: float) -> float:
     """Multiplies integer and float numbers."""
     return x * y
 
 
-@ltls.tool_def()
+@agtk.tool_def()
 async def async_number_tool(x: int, y: float) -> float:
     """Adds integer and float numbers asynchronously."""
     await asyncio.sleep(0.001)
     return x + y
 
 
-@ltls.tool_def()
+@agtk.tool_def()
 def sync_complex_tool(
     data: Annotated[dict, Field(description="Input data dictionary")],
     optional_param: Annotated[bool, Field(description="Optional boolean flag")] = True,
@@ -224,7 +224,7 @@ class TestToolDef:
     def test_tool_def_decorator(self):
         """Test that tool_def decorator attaches _tool_def attribute."""
 
-        @ltls.tool_def(name="decorated_test", description="A test function")
+        @agtk.tool_def(name="decorated_test", description="A test function")
         def test_function():
             pass
 
@@ -236,7 +236,7 @@ class TestToolDef:
     def test_tool_def_uses_docstring(self):
         """Test that tool_def uses docstring if no description provided."""
 
-        @ltls.tool_def(name="docstring_test")
+        @agtk.tool_def(name="docstring_test")
         def test_function():
             """This is the docstring."""
             pass
@@ -248,7 +248,7 @@ class TestToolDef:
     def test_tool_def_empty_description(self):
         """Test that tool_def sets empty description if neither provided."""
 
-        @ltls.tool_def(name="empty_test")
+        @agtk.tool_def(name="empty_test")
         def test_function():
             pass
 

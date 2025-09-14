@@ -2,7 +2,7 @@ import os
 import pytest
 import litellm
 
-from ltls.types import ToolParamSchema
+from agtk.types import ToolParamSchema
 
 OPENAI_MODELS = [
     "openai/o3",

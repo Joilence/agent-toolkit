@@ -4,14 +4,14 @@
 
 ## Automatic Schema Generation from Typings
 
-The schema of this tool will be generated automatically if define with `@ltls.tool_def()`:
+The schema of this tool will be generated automatically if define with `@agtk.tool_def()`:
 
 ```python
-from ltls import Toolkit
+from agtk import Toolkit
 from pydantic import Field
 from typing import Annotated
 
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
     param1: Annotated[int, Field(description="A required integer parameter")],
     param2: Annotated[str, Field(description="A required string parameter")],
@@ -37,13 +37,13 @@ For `Optional[int]`, `Optional[float]`, `Optional[bool]`, simply give a default 
 
 ```python
 # Instead of
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
     param1: Annotated[Optional[int], Field(description="A required integer parameter")],
 ): ...
 
 # Do
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
     param1: Annotated[int, Field(description="A required integer parameter")] = 0,
 ): ...
@@ -53,13 +53,13 @@ For `Optional[list[int]]`, `Optional[list[float]]`, `Optional[list[bool]]`, simi
 
 ```python
 # Instead of
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
     param1: Annotated[Optional[list[int]], Field(description="A required list of integers")],
 ): ...
 
 # Do
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
     param1: Annotated[list[int], Field(default_factory=list, description="A required list of integers")],
 ): ...
@@ -69,14 +69,14 @@ For `BaseModel`, use `BaseModel | str` instead and then use `json.loads` to pars
 
 ```python
 # Instead of
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
     param1: Annotated[BaseModel, Field(description="A required base model parameter")],
 ): ...
 
 
 # Do
-@ltls.tool_def()
+@agtk.tool_def()
 def my_tool(
 param1: Annotated[BaseModel | str, Field(description="A required base model parameter")],
 ):

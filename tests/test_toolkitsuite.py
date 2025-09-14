@@ -9,51 +9,51 @@ import anthropic
 from openai.types.chat.chat_completion_tool_param import ChatCompletionToolParam
 
 from fastmcp import FastMCP
-import ltls
-from ltls.types import ToolParamSchema, ToolkitSuite
+import agtk
+from agtk.types import ToolParamSchema, ToolkitSuite
 
 logger = logging.getLogger(__name__)
 
 
 # Test toolkits for suite testing
-class SystemInfoToolkit(ltls.Toolkit):
+class SystemInfoToolkit(agtk.Toolkit):
     """System information toolkit."""
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def get_system_architecture(self):
         """Gets system architecture."""
         return platform.machine()
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def get_timezone(self):
         """Gets timezone information."""
         return time.tzname[0]
 
 
-class MathToolkit(ltls.Toolkit):
+class MathToolkit(agtk.Toolkit):
     """Mathematical operations toolkit."""
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def add_numbers(self, x: int, y: int) -> int:
         """Adds two numbers."""
         return x + y
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def multiply_numbers(self, x: float, y: float) -> float:
         """Multiplies two numbers."""
         return x * y
 
 
-class AsyncToolkit(ltls.Toolkit):
+class AsyncToolkit(agtk.Toolkit):
     """Async operations toolkit."""
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     async def async_operation(self, delay: float = 0.001) -> str:
         """Performs async operation with delay."""
         await asyncio.sleep(delay)
         return f"Completed after {delay}s"
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def sync_operation(self, value: str) -> str:
         """Performs sync operation."""
         return f"Processed: {value}"

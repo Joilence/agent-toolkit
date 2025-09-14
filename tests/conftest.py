@@ -1,14 +1,14 @@
 import json
 from typing import Annotated, Optional
-import ltls
+import agtk
 from pydantic import Field
 import pytest
 
 
-class TestToolkit(ltls.Toolkit):
+class TestToolkit(agtk.Toolkit):
     """A simple toolkit for testing."""
 
-    @ltls.tool_def(name="tool_with_params")
+    @agtk.tool_def(name="tool_with_params")
     def tool_with_params(
         self,
         str_param: Annotated[str, Field(description="A required string parameter")],
@@ -26,7 +26,7 @@ class TestToolkit(ltls.Toolkit):
         return f"Executed with {str_param}, {int_param} and {bool_param}"
 
 
-@ltls.tool_def()
+@agtk.tool_def()
 def external_tool_function(
     str_param: Annotated[str, Field(description="A required string parameter")],
     int_param: Annotated[
@@ -51,4 +51,4 @@ def test_toolkit():
 if __name__ == "__main__":
     """Test output of param by running `uv run -- python3 tests/conftest.py`"""
     toolkit = TestToolkit()
-    print(json.dumps(toolkit.as_param(ltls.ToolParamSchema.OPENAI), indent=2))
+    print(json.dumps(toolkit.as_param(agtk.ToolParamSchema.OPENAI), indent=2))

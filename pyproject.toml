@@ -1,7 +1,7 @@
 [project]
-name = "ltls"
+name = "agtk"
 version = "0.1.0"
-description = "ltls (llm-tools)"
+description = "agtk (Agent Toolkit)"
 license = { file = "LICENSE" }
 readme = "README.md"
 authors = [{ name = "Jonathan Yang" }]
@@ -38,7 +38,7 @@ dev = [
 ]
 
 [project.scripts]
-ltls = "ltls.cli:cli"
+agtk = "agtk.cli:cli"
 
 [build-system]
 requires = ["hatchling"]
@@ -60,6 +60,6 @@ markers = [
 addopts = "-m 'not integration'"
 
 [project.urls]
-Homepage = "https://github.com/Joilence/llm-tools"
-Repository = "https://github.com/Joilence/llm-tools"
-"Bug Tracker" = "https://github.com/Joilence/llm-tools/issues"
+Homepage = "https://github.com/Joilence/agent-toolkits"
+Repository = "https://github.com/Joilence/agent-toolkits"
+"Bug Tracker" = "https://github.com/Joilence/agent-toolkits/issues"

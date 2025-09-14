@@ -3,7 +3,7 @@ import pytest
 import anthropic
 from typing import Union
 
-from ltls.types import (
+from agtk.types import (
     Toolkit,
     ToolkitSuite,
     ToolParamSchema,

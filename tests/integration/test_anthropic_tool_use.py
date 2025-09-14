@@ -2,7 +2,7 @@ import os
 import pytest
 import anthropic
 
-from ltls.types import ToolParamSchema
+from agtk.types import ToolParamSchema
 
 # Latest Anthropic models as of May 2025 that support tool use
 ANTHROPIC_MODELS = [

@@ -3,8 +3,8 @@ import pytest
 import litellm
 from pydantic import ValidationError
 
-import ltls
-from ltls.types import ToolParamSchema
+import agtk
+from agtk.types import ToolParamSchema
 
 
 PACKAGE_JSON_CONTENT = """{
@@ -39,10 +39,10 @@ TEST_MODELS = [
 ]
 
 
-class FileToolkit(ltls.Toolkit):
+class FileToolkit(agtk.Toolkit):
     """Test toolkit with file creation tool that handles JSON content as strings."""
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def create_file(self, path: str, content: str) -> dict:
         """Creates a file with given path and content.
 

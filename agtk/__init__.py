@@ -1,4 +1,4 @@
-from ltls.types import (
+from agtk.types import (
     ToolParamSchema,
     ToolkitSuite,
     Toolkit,
@@ -7,7 +7,7 @@ from ltls.types import (
     Tool,
     ToolResult,
 )
-from ltls.hookspecs import hookimpl
+from agtk.hookspecs import hookimpl
 
 __all__ = [
     "ToolParamSchema",

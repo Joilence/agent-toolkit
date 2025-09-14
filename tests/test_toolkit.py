@@ -10,17 +10,17 @@ import anthropic
 from openai.types.chat.chat_completion_tool_param import ChatCompletionToolParam
 
 from fastmcp import FastMCP
-import ltls
-from ltls.types import ToolParamSchema
+import agtk
+from agtk.types import ToolParamSchema
 
 logger = logging.getLogger(__name__)
 
 
 # Test toolkit with various tool patterns
-class SystemInfoToolkit(ltls.Toolkit):
+class SystemInfoToolkit(agtk.Toolkit):
     """Test toolkit with system information tools."""
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def get_system_architecture(self):
         """Gets system architecture with async wrapper pattern."""
         import platform
@@ -31,12 +31,12 @@ class SystemInfoToolkit(ltls.Toolkit):
         result = asyncio.run(async_wrapper())
         return result
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def get_timezone(self):
         """Gets timezone information."""
         return time.tzname[0]
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def get_platform_info(
         self,
         include_version: Annotated[
@@ -50,16 +50,16 @@ class SystemInfoToolkit(ltls.Toolkit):
         return info
 
 
-class AsyncToolkit(ltls.Toolkit):
+class AsyncToolkit(agtk.Toolkit):
     """Test toolkit with async tools."""
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     async def async_operation(self, delay: float = 0.001):
         """Performs async operation with delay."""
         await asyncio.sleep(delay)
         return f"Completed after {delay}s"
 
-    @ltls.tool_def()
+    @agtk.tool_def()
     def sync_operation(self, value: str):
         """Performs sync operation."""
         return f"Processed: {value}"

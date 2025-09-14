@@ -1,36 +1,36 @@
-# `llm-tools` Toolkit Plugin
+# `agtk` Toolkit Plugin
 
-The `llm-tools` Toolkit plugin allows for extending the toolkit collection through plugins.
+The `agtk` Toolkit plugin allows for extending the toolkit collection through plugins.
 
 ## Install a plugin
 
 ```bash
-ltls install <plugin_name>
+agtk install <plugin_name>
 ```
 
 ## Develop a plugin
 
 ```python
-import ltls
+import agtk
 
 
-@ltls.hookimpl
+@agtk.hookimpl
 def register_toolkit(register):
     register(MyToolkit())
 
-class MyToolkit(ltls.Toolkit):
+class MyToolkit(agtk.Toolkit):
 
     def _echo_helper(self, content: str) -> str:
         return f"echo: {content}"
 
-    @ltls.tool_def(
+    @agtk.tool_def(
         name="echo",
         description="Echo a message",
     )
     def echo(self, content: str) -> str:
         return self._echo_helper(content)
 
-    @ltls.tool_def(
+    @agtk.tool_def(
         name="echo_twice",
         description="Echo a message twice",
     )
@@ -41,10 +41,10 @@ class MyToolkit(ltls.Toolkit):
 You can install the plugin with:
 
 ```bash
-ltls install -e .
+agtk install -e .
 # or
-ltls install -e <path_to_plugin_dir>
+agtk install -e <path_to_plugin_dir>
 
 # check if the plugin is installed
-ltls plugins
+agtk plugins
 ```
