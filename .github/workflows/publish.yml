@@ -11,6 +11,10 @@ on:
         default: false
         type: boolean
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build distribution
@@ -28,6 +32,11 @@ jobs:
         run: uv python install 3.12
       - name: Build distribution
         run: uv build --no-sources
+      - name: Validate built package
+        run: |
+          python -m venv /tmp/test-env
+          /tmp/test-env/bin/pip install dist/*.whl
+          /tmp/test-env/bin/python -c "import agtk; print('Package importable')"
       - name: Upload distribution artifacts
         uses: actions/upload-artifact@v4
         with:
