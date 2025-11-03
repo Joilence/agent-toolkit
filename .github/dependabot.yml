@@ -19,11 +19,13 @@ updates:
       prefix-development: "chore(deps-dev)"
       include: "scope"
 
-    # Minimum package age (cooldown to avoid churn)
-    minimum-package-age:
-      patch: 3
-      minor: 7
-      major: 14
+    # Cooldown period to avoid churn from newly released packages
+    # Note: semver-major-days is redundant since major versions are ignored below,
+    # but kept for completeness if ignore rules are modified later
+    cooldown:
+      semver-patch-days: 3
+      semver-minor-days: 7
+      semver-major-days: 14
 
     # Auto-rebase when conflicts occur
     rebase-strategy: "auto"
