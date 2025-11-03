@@ -1,0 +1,78 @@
+version: 2
+
+updates:
+  # Python dependencies (using uv)
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Los_Angeles"
+
+    # Limit open PRs to reduce noise
+    open-pull-requests-limit: 3
+
+    # Commit message convention (follows conventional commits)
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+
+    # Minimum package age (cooldown to avoid churn)
+    minimum-package-age:
+      patch: 3
+      minor: 7
+      major: 14
+
+    # Auto-rebase when conflicts occur
+    rebase-strategy: "auto"
+
+    # Labels for easier PR management
+    labels:
+      - "dependencies"
+      - "python"
+
+    # Ignore all major version updates (manual review required)
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+    # Grouped version updates (2 groups: all dependencies + security)
+    groups:
+      # Group 1: All minor and patch updates together
+      all-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      # Group 2: Security updates (separate from version updates)
+      security-updates:
+        patterns:
+          - "*"
+        applies-to: "security-updates"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+
+    open-pull-requests-limit: 3
+
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
