@@ -1,80 +1,39 @@
 version: 2
 
 updates:
-  # Python dependencies (using uv)
+  # Python dependencies (uv)
   - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "America/Los_Angeles"
 
-    # Limit open PRs to reduce noise
-    open-pull-requests-limit: 3
-
-    # Commit message convention (follows conventional commits)
-    # Using fix(deps) to trigger patch releases in Release Please
+    # Use "chore:" prefix - dependency updates won't trigger releases
+    # Change to "fix" if you want every dependency update to create a release
     commit-message:
-      prefix: "fix(deps)"
+      prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
-      include: "scope"
 
-    # Cooldown period to avoid churn from newly released packages
-    # Note: semver-major-days is redundant since major versions are ignored below,
-    # but kept for completeness if ignore rules are modified later
-    cooldown:
-      semver-patch-days: 3
-      semver-minor-days: 7
-      semver-major-days: 14
-
-    # Auto-rebase when conflicts occur
-    rebase-strategy: "auto"
-
-    # Labels for easier PR management
     labels:
       - "dependencies"
-      - "python"
 
-    # Ignore all major version updates (manual review required)
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-
-    # Grouped version updates (2 groups: all dependencies + security)
+    # Group all updates to reduce PR noise
     groups:
-      # Group 1: All minor and patch updates together
-      all-dependencies:
+      dependencies:
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
 
-      # Group 2: Security updates (separate from version updates)
-      security-updates:
-        patterns:
-          - "*"
-        applies-to: "security-updates"
-
-  # GitHub Actions dependencies
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-      day: "monday"
-
-    open-pull-requests-limit: 3
 
     commit-message:
       prefix: "chore(ci)"
-      include: "scope"
 
     labels:
       - "dependencies"
-      - "github-actions"
 
-    # Group all GitHub Actions updates together
     groups:
       github-actions:
         patterns:
