@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/Joilence/agent-toolkit/compare/v0.1.0...v0.1.1) (2025-11-03)
+
+
+### Bug Fixes
+
+* **deps:** bump versions ([01b6cfa](https://github.com/Joilence/agent-toolkit/commit/01b6cfaef162575088f9db466359bf33a7a1efe0))
+* **deps:** bump versions ([af23cb4](https://github.com/Joilence/agent-toolkit/commit/af23cb4a1bbf290442b914f798e40de972f7f006))
+
 ## 0.1.0 (2025-11-03)
 
 
