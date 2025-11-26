@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/Joilence/agent-toolkit/compare/v0.1.1...v0.2.0) (2025-11-26)
+
+
+### Features
+
+* allow disable tools in toolkit ([#12](https://github.com/Joilence/agent-toolkit/issues/12)) ([c7cacb9](https://github.com/Joilence/agent-toolkit/commit/c7cacb96a27f94ec33c28b21220cf396c50c76a5))
+
 ## [0.1.1](https://github.com/Joilence/agent-toolkit/compare/v0.1.0...v0.1.1) (2025-11-03)
 
 
