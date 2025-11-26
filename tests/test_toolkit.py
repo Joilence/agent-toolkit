@@ -215,6 +215,33 @@ class TestToolkit:
         ):
             await toolkit.aexecute_tool("nonexistent_tool", {})
 
+    def test_disabled_tools(self):
+        """Test that disabled_tools parameter filters out specified tools."""
+        # Create toolkit with one tool disabled
+        toolkit = SystemInfoToolkit(disabled_tools=["get_timezone"])
+
+        tool_names = toolkit.tool_names
+
+        # Verify disabled tool is not available
+        assert "get_timezone" not in tool_names
+
+        # Verify other tools are still available
+        assert "get_system_architecture" in tool_names
+        assert "get_platform_info" in tool_names
+        assert len(tool_names) == 2
+
+    def test_no_disabled_tools(self):
+        """Test that all tools are available when disabled_tools is not provided."""
+        toolkit = SystemInfoToolkit()
+
+        tool_names = toolkit.tool_names
+
+        # All tools should be available
+        assert len(tool_names) == 3
+        assert "get_timezone" in tool_names
+        assert "get_system_architecture" in tool_names
+        assert "get_platform_info" in tool_names
+
 
 class TestToolkitAsync:
     """Test Toolkit async functionality."""

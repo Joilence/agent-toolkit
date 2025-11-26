@@ -123,6 +123,15 @@ class Tool(FastMCPFunctionTool):
 class Toolkit(ABC):
     """A set of tools that supposed to work together"""
 
+    def __init__(self, disabled_tools: Optional[list[str]] = None):
+        """Initialize toolkit with optional list of disabled tools.
+        Helpful if you wish to instantiate the toolkit with different tool configs
+
+        Args:
+            disabled_tools: List of tool names to disable.
+        """
+        self._disabled_tools = disabled_tools
+
     @property
     def name(self) -> str:
         return self.__class__.__name__
@@ -158,6 +167,7 @@ class Toolkit(ABC):
         """Automatically pickup all tools in the class, which:
         - are functions
         - are decorated with `tool_def`
+        - are not in disabled_tools list
         """
         tool_functions = []
         for attr_name in dir(self):
@@ -170,7 +180,10 @@ class Toolkit(ABC):
             # Then get the instance attribute
             attr = getattr(self, attr_name)
             if callable(attr) and hasattr(attr, "_tool_def"):
-                tool_functions.append(attr)
+                tool_name = getattr(attr, "_tool_def").name
+                # Filter out disabled tools before creating Tool objects
+                if not self._disabled_tools or tool_name not in self._disabled_tools:
+                    tool_functions.append(attr)
 
         return [
             cast(
