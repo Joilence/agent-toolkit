@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/Joilence/agent-toolkit/compare/v0.2.0...v0.2.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* **deps:** raise fastmcp floor to &gt;=3.2.0 ([#52](https://github.com/Joilence/agent-toolkit/issues/52)) ([209db6f](https://github.com/Joilence/agent-toolkit/commit/209db6f32a3fe45919141cfb8b90b6a420ec2b13))
+
 ## [0.2.0](https://github.com/Joilence/agent-toolkit/compare/v0.1.1...v0.2.0) (2025-11-26)
 
 
